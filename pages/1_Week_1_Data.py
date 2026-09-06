@@ -4,13 +4,13 @@ import numpy as np
 import altair as alt
 
 st.set_page_config(page_title="Chapter 1: Sampling and Data", layout="wide")
-st.title("Chapter 1: Sampling, Data, and Levels of Measurement")
+st.title("Chapter 1: Sampling, Data, Levels of Measurement, Experimental Design and Ethics")
 
 # ---------------------------------------------------------
 # Introduction & Learning Objectives
 # ---------------------------------------------------------
 st.markdown("""
-Welcome to the interactive module for **Chapter 1: Sampling, Data, and Levels of Measurement**. 
+Welcome to the interactive module for **Chapter 1: Sampling, Data, and Levels of Measurement, , Experimental Design and Ethics**. 
 
 ### The Scenario: Quantitative ETF Analysis (0050)
 In this module, you are a quantitative analyst evaluating historical tick and daily flow data for the **Yuanta Taiwan 50 ETF (0050)**. Instead of memorizing abstract textbook definitions, you will interact with market data to prove statistical concepts visually.
