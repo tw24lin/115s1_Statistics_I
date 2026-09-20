@@ -341,9 +341,9 @@ with main_tab2:
     loc_t1, loc_t2 = st.tabs(["2.1 Intuition of Quartiles", "2.2 Intuition of Percentiles"])
     
     # --- 2.1 Quartiles Intuition (Odd vs Even) ---
-    # --- 2.1 Quartiles Intuition (Odd vs Even directly following each other) ---
+    # --- 2.1 Quartiles & Outliers Intuition ---
     with loc_t1:
-        st.subheader("Finding Quartiles Step-by-Step")
+        st.subheader("Finding Quartiles and Outliers Step-by-Step")
         
         st.markdown("#### Scenario A: Odd Samples (N=11)")
         st.markdown("We drew 11 random closing prices from our dataset and **sorted them from smallest to largest**.")
@@ -361,27 +361,51 @@ with main_tab2:
             cols[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
         
         c1, c2 = st.columns([1, 1.2])
+        
+        q1_a = small_sample[2]
+        med_a = small_sample[5]
+        q3_a = small_sample[8]
+        iqr_a = q3_a - q1_a
+        lower_fence_a = q1_a - (1.5 * iqr_a)
+        upper_fence_a = q3_a + (1.5 * iqr_a)
+        outliers_a = [v for v in small_sample if v < lower_fence_a or v > upper_fence_a]
+        outlier_txt_a = f"**Yes!** {outliers_a} falls outside the fences." if outliers_a else "**None.** All data points are inside the fences."
+        
         with c1:
             st.markdown(f"""
             **Step 1: Find the Median (Q2)**
             * The median cuts the data exactly in half. For N=11, the middle is uniquely **Position 6**. 
-            * **<span style='color:#007bff;'>Q2 = {small_sample[5]:.2f}</span>**
+            * **<span style='color:#007bff;'>Q2 = {med_a:.2f}</span>**
             
             **Step 2: Find Q1 (Median of the lower half)**
             * Look at values *below* Q2 (Positions 1 to 5). The middle of those 5 numbers is Position 3.
-            * **<span style='color:#28a745;'>Q1 = {small_sample[2]:.2f}</span>**
+            * **<span style='color:#28a745;'>Q1 = {q1_a:.2f}</span>**
             
             **Step 3: Find Q3 (Median of the upper half)**
             * Look at values *above* Q2 (Positions 7 to 11). The middle is Position 9.
-            * **<span style='color:#ffc107;'>Q3 = {small_sample[8]:.2f}</span>**
+            * **<span style='color:#ffc107;'>Q3 = {q3_a:.2f}</span>**
+            
+            **Step 4: Interquartile Range (IQR)**
+            * *Intuition: The IQR measures the spread of the middle 50% of the data.*
+            * IQR = Q3 - Q1 = {q3_a:.2f} - {q1_a:.2f} = **{iqr_a:.2f}**
+            
+            **Step 5: Identify Outliers (1.5x IQR Rule)**
+            * *Intuition: Any value too far from the middle 50% is flagged as an outlier.*
+            * Lower Fence = Q1 - 1.5(IQR) = **{lower_fence_a:.2f}**
+            * Upper Fence = Q3 + 1.5(IQR) = **{upper_fence_a:.2f}**
+            * *Are there outliers?* {outlier_txt_a}
             """, unsafe_allow_html=True)
             
         with c2:
             fig_box = px.box(x=small_sample, points="all", title="Horizontal Box Plot Mapping (N=11)", orientation="h")
-            fig_box.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
-            fig_box.add_vline(x=small_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
-            fig_box.add_vline(x=small_sample[5], line_dash="dot", line_color="#007bff", annotation_text="Median")
-            fig_box.add_vline(x=small_sample[8], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+            fig_box.update_traces(quartilemethod="exclusive")
+            fig_box.update_layout(xaxis_title="Closing Price", yaxis_title="", height=350)
+            fig_box.add_vline(x=q1_a, line_dash="dot", line_color="#28a745", annotation_text="Q1")
+            fig_box.add_vline(x=med_a, line_dash="dot", line_color="#007bff", annotation_text="Median")
+            fig_box.add_vline(x=q3_a, line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+            # Add fences
+            fig_box.add_vline(x=lower_fence_a, line_dash="dash", line_color="red", annotation_text="Lower Fence")
+            fig_box.add_vline(x=upper_fence_a, line_dash="dash", line_color="red", annotation_text="Upper Fence")
             st.plotly_chart(fig_box, use_container_width=True)
 
         st.markdown("---")
@@ -405,31 +429,141 @@ with main_tab2:
             cols_even[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
         
         c3, c4 = st.columns([1, 1.2])
-        med_even = (even_sample[4] + even_sample[5]) / 2
+        
+        q1_b = even_sample[2]
+        med_b = (even_sample[4] + even_sample[5]) / 2
+        q3_b = even_sample[7]
+        iqr_b = q3_b - q1_b
+        lower_fence_b = q1_b - (1.5 * iqr_b)
+        upper_fence_b = q3_b + (1.5 * iqr_b)
+        outliers_b = [v for v in even_sample if v < lower_fence_b or v > upper_fence_b]
+        outliers_str_b = ", ".join([f"{v:.2f}" for v in outliers_b])
+        outlier_txt_b = f"**Yes!** {outliers_str_b} falls outside the fences." if outliers_b else "**None.** All data points are inside the fences."
         
         with c3:
             st.markdown(f"""
             **Step 1: Find the Median (Q2)**
             * For N=10, there is no single middle number. It falls *between* **Position 5 and 6**. 
             * We average them: `({even_sample[4]:.2f} + {even_sample[5]:.2f}) / 2`
-            * **<span style='color:#007bff;'>Q2 = {med_even:.2f}</span>**
+            * **<span style='color:#007bff;'>Q2 = {med_b:.2f}</span>**
             
             **Step 2: Find Q1 (Median of the lower half)**
             * The lower half is Positions 1 to 5. The middle of these 5 numbers is Position 3.
-            * **<span style='color:#28a745;'>Q1 = {even_sample[2]:.2f}</span>**
+            * **<span style='color:#28a745;'>Q1 = {q1_b:.2f}</span>**
             
             **Step 3: Find Q3 (Median of the upper half)**
             * The upper half is Positions 6 to 10. The middle of these 5 numbers is Position 8.
-            * **<span style='color:#ffc107;'>Q3 = {even_sample[7]:.2f}</span>**
+            * **<span style='color:#ffc107;'>Q3 = {q3_b:.2f}</span>**
+            
+            **Step 4: Interquartile Range (IQR)**
+            * IQR = Q3 - Q1 = {q3_b:.2f} - {q1_b:.2f} = **{iqr_b:.2f}**
+            
+            **Step 5: Identify Outliers (1.5x IQR Rule)**
+            * Lower Fence = Q1 - 1.5(IQR) = **{lower_fence_b:.2f}**
+            * Upper Fence = Q3 + 1.5(IQR) = **{upper_fence_b:.2f}**
+            * *Are there outliers?* {outlier_txt_b}
             """, unsafe_allow_html=True)
             
         with c4:
             fig_box_even = px.box(x=even_sample, points="all", title="Horizontal Box Plot Mapping (N=10)", orientation="h")
-            fig_box_even.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
-            fig_box_even.add_vline(x=even_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
-            fig_box_even.add_vline(x=med_even, line_dash="dot", line_color="#007bff", annotation_text="Median")
-            fig_box_even.add_vline(x=even_sample[7], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+            fig_box_even.update_traces(quartilemethod="exclusive")
+            fig_box_even.update_layout(xaxis_title="Closing Price", yaxis_title="", height=350)
+            fig_box_even.add_vline(x=q1_b, line_dash="dot", line_color="#28a745", annotation_text="Q1")
+            fig_box_even.add_vline(x=med_b, line_dash="dot", line_color="#007bff", annotation_text="Median")
+            fig_box_even.add_vline(x=q3_b, line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+            # Add fences
+            fig_box_even.add_vline(x=lower_fence_b, line_dash="dash", line_color="red", annotation_text="Lower Fence")
+            fig_box_even.add_vline(x=upper_fence_b, line_dash="dash", line_color="red", annotation_text="Upper Fence")
             st.plotly_chart(fig_box_even, use_container_width=True)
+    # # --- 2.1 Quartiles Intuition (Odd vs Even directly following each other) ---
+    # with loc_t1:
+    #     st.subheader("Finding Quartiles Step-by-Step")
+        
+    #     st.markdown("#### Scenario A: Odd Samples (N=11)")
+    #     st.markdown("We drew 11 random closing prices from our dataset and **sorted them from smallest to largest**.")
+        
+    #     cols = st.columns(11)
+    #     for i, val in enumerate(small_sample):
+    #         bg_color, border, label = "#f0f2f6", "1px solid #ccc", f"Pos {i+1}"
+    #         if i == 2:   
+    #             bg_color, border, label = "#d4edda", "2px solid #28a745", "Q1 (Pos 3)"
+    #         elif i == 5: 
+    #             bg_color, border, label = "#cce5ff", "2px solid #007bff", "Med (Pos 6)"
+    #         elif i == 8: 
+    #             bg_color, border, label = "#fff3cd", "2px solid #ffc107", "Q3 (Pos 9)"
+                
+    #         cols[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
+        
+    #     c1, c2 = st.columns([1, 1.2])
+    #     with c1:
+    #         st.markdown(f"""
+    #         **Step 1: Find the Median (Q2)**
+    #         * The median cuts the data exactly in half. For N=11, the middle is uniquely **Position 6**. 
+    #         * **<span style='color:#007bff;'>Q2 = {small_sample[5]:.2f}</span>**
+            
+    #         **Step 2: Find Q1 (Median of the lower half)**
+    #         * Look at values *below* Q2 (Positions 1 to 5). The middle of those 5 numbers is Position 3.
+    #         * **<span style='color:#28a745;'>Q1 = {small_sample[2]:.2f}</span>**
+            
+    #         **Step 3: Find Q3 (Median of the upper half)**
+    #         * Look at values *above* Q2 (Positions 7 to 11). The middle is Position 9.
+    #         * **<span style='color:#ffc107;'>Q3 = {small_sample[8]:.2f}</span>**
+    #         """, unsafe_allow_html=True)
+            
+    #     with c2:
+    #         fig_box = px.box(x=small_sample, points="all", title="Horizontal Box Plot Mapping (N=11)", orientation="h")
+    #         fig_box.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
+    #         fig_box.add_vline(x=small_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
+    #         fig_box.add_vline(x=small_sample[5], line_dash="dot", line_color="#007bff", annotation_text="Median")
+    #         fig_box.add_vline(x=small_sample[8], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+    #         st.plotly_chart(fig_box, use_container_width=True)
+
+    #     st.markdown("---")
+        
+    #     st.markdown("#### Scenario B: Even Samples (N=10)")
+    #     st.markdown("Let's draw a new sample of **10 items** to see how the math changes when there is no single middle number.")
+        
+    #     np.random.seed(101)
+    #     even_sample = np.sort(np.random.choice(df['Closing_Price'], size=10, replace=False))
+        
+    #     cols_even = st.columns(10)
+    #     for i, val in enumerate(even_sample):
+    #         bg_color, border, label = "#f0f2f6", "1px solid #ccc", f"Pos {i+1}"
+    #         if i == 2:   
+    #             bg_color, border, label = "#d4edda", "2px solid #28a745", "Q1 (Pos 3)"
+    #         elif i == 4 or i == 5: 
+    #             bg_color, border, label = "#cce5ff", "2px solid #007bff", f"Med Base"
+    #         elif i == 7: 
+    #             bg_color, border, label = "#fff3cd", "2px solid #ffc107", "Q3 (Pos 8)"
+                
+    #         cols_even[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
+        
+    #     c3, c4 = st.columns([1, 1.2])
+    #     med_even = (even_sample[4] + even_sample[5]) / 2
+        
+    #     with c3:
+    #         st.markdown(f"""
+    #         **Step 1: Find the Median (Q2)**
+    #         * For N=10, there is no single middle number. It falls *between* **Position 5 and 6**. 
+    #         * We average them: `({even_sample[4]:.2f} + {even_sample[5]:.2f}) / 2`
+    #         * **<span style='color:#007bff;'>Q2 = {med_even:.2f}</span>**
+            
+    #         **Step 2: Find Q1 (Median of the lower half)**
+    #         * The lower half is Positions 1 to 5. The middle of these 5 numbers is Position 3.
+    #         * **<span style='color:#28a745;'>Q1 = {even_sample[2]:.2f}</span>**
+            
+    #         **Step 3: Find Q3 (Median of the upper half)**
+    #         * The upper half is Positions 6 to 10. The middle of these 5 numbers is Position 8.
+    #         * **<span style='color:#ffc107;'>Q3 = {even_sample[7]:.2f}</span>**
+    #         """, unsafe_allow_html=True)
+            
+    #     with c4:
+    #         fig_box_even = px.box(x=even_sample, points="all", title="Horizontal Box Plot Mapping (N=10)", orientation="h")
+    #         fig_box_even.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
+    #         fig_box_even.add_vline(x=even_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
+    #         fig_box_even.add_vline(x=med_even, line_dash="dot", line_color="#007bff", annotation_text="Median")
+    #         fig_box_even.add_vline(x=even_sample[7], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
+    #         st.plotly_chart(fig_box_even, use_container_width=True)
 
 
 
