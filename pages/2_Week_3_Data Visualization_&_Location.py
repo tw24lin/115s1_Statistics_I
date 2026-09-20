@@ -38,15 +38,15 @@ df = load_data()
 # ==========================================
 # APP HEADER & DATA OVERVIEW
 # ==========================================
-st.title("📊 Intuition Engine: Data Visualization & Location")
+st.title("Intuition Engine: Data Visualization & Location")
 
 st.success("""
-**🎯 Core Objective:** Statistics is just storytelling with numbers. 
+**Core Objective:** Statistics is just storytelling with numbers. 
 Use the interactive tools below to see how changing parameters alters the mathematical story. 
 *Do not just look at the graphs—play with them!*
 """)
 
-with st.expander("🔍 Step 1: Inspect the Raw Data (Overview)", expanded=False):
+with st.expander("Step 1: Inspect the Raw Data (Overview)", expanded=False):
     st.markdown("Before we graph anything, look at the raw data. This is **Project Alpha**.")
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -60,7 +60,7 @@ with st.expander("🔍 Step 1: Inspect the Raw Data (Overview)", expanded=False)
         * **Volatility_Spikes:** Quantitative (Discrete). Daily count of anomalies.
         """)
 
-main_tab1, main_tab2 = st.tabs(["📉 Part 1: Displaying Data", "🎯 Part 2: Measures of Location"])
+main_tab1, main_tab2 = st.tabs(["Part 1: Displaying Data", "Part 2: Measures of Location"])
 
 # ==========================================
 # PART 1: DISPLAYING DATA
@@ -181,26 +181,6 @@ with main_tab1:
             fig_spikes.update_layout(bargap=0.4, yaxis_title="Total Spikes") 
             st.plotly_chart(fig_spikes, use_container_width=True)
 
-    # # --- 1.3 Bar Graphs ---
-    # with t_bar:
-    #     st.info("💡 **Concept:** Bar graphs are used for Categorical data. Notice how the **shape** is identical whether we look at raw counts or percentages.")
-        
-    #     bar_data = df['Daily_Trend'].value_counts().reset_index()
-    #     bar_data.columns = ['Daily_Trend', 'Count']
-    #     bar_data['Percentage'] = (bar_data['Count'] / bar_data['Count'].sum()) * 100
-        
-    #     c1, c2 = st.columns(2)
-    #     with c1:
-    #         st.markdown("### Frequency (Counts)")
-    #         fig_freq = px.bar(bar_data, x='Daily_Trend', y='Count', text='Count')
-    #         fig_freq.update_layout(bargap=0.4) 
-    #         st.plotly_chart(fig_freq, use_container_width=True)
-    #     with c2:
-    #         st.markdown("### Relative Frequency (Percentages)")
-    #         fig_rel = px.bar(bar_data, x='Daily_Trend', y='Percentage', text='Percentage')
-    #         fig_rel.update_traces(texttemplate='%{text:.1f}%')
-    #         fig_rel.update_layout(bargap=0.4, yaxis_title="Percentage (%)") 
-    #         st.plotly_chart(fig_rel, use_container_width=True)
 
     # --- 1.4 & 1.5 Histograms & Polygons (With Relative Frequency) ---
     with t_hist:
@@ -321,21 +301,6 @@ with main_tab2:
     np.random.seed(99)
     small_sample = np.sort(np.random.choice(df['Closing_Price'], size=11, replace=False))
     n_small = len(small_sample)
-    
-    # st.markdown("### 🔢 Our Base Small Sample (N = 11)")
-    # st.markdown("We drew 11 random closing prices from our dataset and **sorted them from smallest to largest**.")
-    
-    # cols = st.columns(11)
-    # for i, val in enumerate(small_sample):
-    #     bg_color, border, label = "#f0f2f6", "1px solid #ccc", f"Pos {i+1}"
-    #     if i == 2:   
-    #         bg_color, border, label = "#d4edda", "2px solid #28a745", "Q1 (Pos 3)"
-    #     elif i == 5: 
-    #         bg_color, border, label = "#cce5ff", "2px solid #007bff", "Med (Pos 6)"
-    #     elif i == 8: 
-    #         bg_color, border, label = "#fff3cd", "2px solid #ffc107", "Q3 (Pos 9)"
-            
-    #     cols[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
     
     st.write("")
     loc_t1, loc_t2 = st.tabs(["2.1 Intuition of Quartiles", "2.2 Intuition of Percentiles"])
@@ -475,96 +440,6 @@ with main_tab2:
             fig_box_even.add_vline(x=lower_fence_b, line_dash="dash", line_color="red", annotation_text="Lower Fence")
             fig_box_even.add_vline(x=upper_fence_b, line_dash="dash", line_color="red", annotation_text="Upper Fence")
             st.plotly_chart(fig_box_even, use_container_width=True)
-    # # --- 2.1 Quartiles Intuition (Odd vs Even directly following each other) ---
-    # with loc_t1:
-    #     st.subheader("Finding Quartiles Step-by-Step")
-        
-    #     st.markdown("#### Scenario A: Odd Samples (N=11)")
-    #     st.markdown("We drew 11 random closing prices from our dataset and **sorted them from smallest to largest**.")
-        
-    #     cols = st.columns(11)
-    #     for i, val in enumerate(small_sample):
-    #         bg_color, border, label = "#f0f2f6", "1px solid #ccc", f"Pos {i+1}"
-    #         if i == 2:   
-    #             bg_color, border, label = "#d4edda", "2px solid #28a745", "Q1 (Pos 3)"
-    #         elif i == 5: 
-    #             bg_color, border, label = "#cce5ff", "2px solid #007bff", "Med (Pos 6)"
-    #         elif i == 8: 
-    #             bg_color, border, label = "#fff3cd", "2px solid #ffc107", "Q3 (Pos 9)"
-                
-    #         cols[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
-        
-    #     c1, c2 = st.columns([1, 1.2])
-    #     with c1:
-    #         st.markdown(f"""
-    #         **Step 1: Find the Median (Q2)**
-    #         * The median cuts the data exactly in half. For N=11, the middle is uniquely **Position 6**. 
-    #         * **<span style='color:#007bff;'>Q2 = {small_sample[5]:.2f}</span>**
-            
-    #         **Step 2: Find Q1 (Median of the lower half)**
-    #         * Look at values *below* Q2 (Positions 1 to 5). The middle of those 5 numbers is Position 3.
-    #         * **<span style='color:#28a745;'>Q1 = {small_sample[2]:.2f}</span>**
-            
-    #         **Step 3: Find Q3 (Median of the upper half)**
-    #         * Look at values *above* Q2 (Positions 7 to 11). The middle is Position 9.
-    #         * **<span style='color:#ffc107;'>Q3 = {small_sample[8]:.2f}</span>**
-    #         """, unsafe_allow_html=True)
-            
-    #     with c2:
-    #         fig_box = px.box(x=small_sample, points="all", title="Horizontal Box Plot Mapping (N=11)", orientation="h")
-    #         fig_box.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
-    #         fig_box.add_vline(x=small_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
-    #         fig_box.add_vline(x=small_sample[5], line_dash="dot", line_color="#007bff", annotation_text="Median")
-    #         fig_box.add_vline(x=small_sample[8], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
-    #         st.plotly_chart(fig_box, use_container_width=True)
-
-    #     st.markdown("---")
-        
-    #     st.markdown("#### Scenario B: Even Samples (N=10)")
-    #     st.markdown("Let's draw a new sample of **10 items** to see how the math changes when there is no single middle number.")
-        
-    #     np.random.seed(101)
-    #     even_sample = np.sort(np.random.choice(df['Closing_Price'], size=10, replace=False))
-        
-    #     cols_even = st.columns(10)
-    #     for i, val in enumerate(even_sample):
-    #         bg_color, border, label = "#f0f2f6", "1px solid #ccc", f"Pos {i+1}"
-    #         if i == 2:   
-    #             bg_color, border, label = "#d4edda", "2px solid #28a745", "Q1 (Pos 3)"
-    #         elif i == 4 or i == 5: 
-    #             bg_color, border, label = "#cce5ff", "2px solid #007bff", f"Med Base"
-    #         elif i == 7: 
-    #             bg_color, border, label = "#fff3cd", "2px solid #ffc107", "Q3 (Pos 8)"
-                
-    #         cols_even[i].markdown(f"<div style='text-align:center; background-color:{bg_color}; padding:8px; border-radius:5px; border:{border}; font-size:14px;'><b>{label}</b><br>{val:.1f}</div>", unsafe_allow_html=True)
-        
-    #     c3, c4 = st.columns([1, 1.2])
-    #     med_even = (even_sample[4] + even_sample[5]) / 2
-        
-    #     with c3:
-    #         st.markdown(f"""
-    #         **Step 1: Find the Median (Q2)**
-    #         * For N=10, there is no single middle number. It falls *between* **Position 5 and 6**. 
-    #         * We average them: `({even_sample[4]:.2f} + {even_sample[5]:.2f}) / 2`
-    #         * **<span style='color:#007bff;'>Q2 = {med_even:.2f}</span>**
-            
-    #         **Step 2: Find Q1 (Median of the lower half)**
-    #         * The lower half is Positions 1 to 5. The middle of these 5 numbers is Position 3.
-    #         * **<span style='color:#28a745;'>Q1 = {even_sample[2]:.2f}</span>**
-            
-    #         **Step 3: Find Q3 (Median of the upper half)**
-    #         * The upper half is Positions 6 to 10. The middle of these 5 numbers is Position 8.
-    #         * **<span style='color:#ffc107;'>Q3 = {even_sample[7]:.2f}</span>**
-    #         """, unsafe_allow_html=True)
-            
-    #     with c4:
-    #         fig_box_even = px.box(x=even_sample, points="all", title="Horizontal Box Plot Mapping (N=10)", orientation="h")
-    #         fig_box_even.update_layout(xaxis_title="Closing Price", yaxis_title="", height=250)
-    #         fig_box_even.add_vline(x=even_sample[2], line_dash="dot", line_color="#28a745", annotation_text="Q1")
-    #         fig_box_even.add_vline(x=med_even, line_dash="dot", line_color="#007bff", annotation_text="Median")
-    #         fig_box_even.add_vline(x=even_sample[7], line_dash="dot", line_color="#ffc107", annotation_text="Q3")
-    #         st.plotly_chart(fig_box_even, use_container_width=True)
-
 
 
     # --- 2.2 Percentiles Intuition (Fully Updated) ---
