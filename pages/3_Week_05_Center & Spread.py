@@ -281,9 +281,9 @@ with main_tab1:
             st.plotly_chart(fig_geom, width='stretch')
             
             if arithmetic_return > geom_return:
-                st.warning(f"##### **Look at the red line! The Arithmetic mean claims you are making +{arithmetic_return:.2f}% every year. But the green line shows your true portfolio value. The Geometric mean ({geom_str.replace('%', ' %').replace('\\text{Total Loss}', 'Total Loss')}) tells the exact truth about your actual compounded growth.**")
+                st.warning(f"##### **Look at the red line! The Arithmetic mean claims you are making +{arithmetic_return:.2f}% every year. But the green line shows your true portfolio value. The Geometric mean ({geom_return:.2f}%) tells the exact truth about your actual compounded growth.**")
 
-                
+
 
     with c_tab4:
         st.info("💡##### **Concept:** Skewness occurs when outliers pull the Mean away from the Median.")
