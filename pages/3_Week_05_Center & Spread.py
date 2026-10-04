@@ -202,28 +202,61 @@ with main_tab1:
             fig_samp.update_layout(barmode='overlay', title="Population vs. Sample Distribution")
             st.plotly_chart(fig_samp, width='stretch')
 
-    # --- 1.3 Geometric Mean ---
+# --- 1.3 Geometric Mean ---
     with c_tab3:
         st.info("💡##### **Concept:** Why is the Geometric Mean required in finance? Because the Arithmetic Mean **lies** about compounded growth.")
-        c1, c2 = st.columns([1, 1.5])
+        c1, c2 = st.columns([1.2, 1])
         with c1:
             st.markdown("*(Note: Returns are expressed in percentages (%). `100` means +100%, `-50` means -50%.)*")
-            r1 = st.number_input("Year 1 Return (%):", value=100.0, step=10.0)
-            r2 = st.number_input("Year 2 Return (%):", value=-50.0, step=10.0)
+            col_in1, col_in2 = st.columns(2)
+            with col_in1:
+                r1 = st.number_input("Year 1 Return (%):", value=100.0, step=10.0)
+            with col_in2:
+                r2 = st.number_input("Year 2 Return (%):", value=-50.0, step=10.0)
             
-            arithmetic_mean = (r1 + r2) / 2
+            # Base variables
             m1 = 1 + (r1/100)
             m2 = 1 + (r2/100)
-            if (m1 * m2) >= 0:
-                geom_mean = (math.sqrt(m1 * m2) - 1) * 100
-                geom_str = f"{geom_mean:.2f}%"
-            else:
-                geom_mean = -100
-                geom_str = "Total Loss"
             
-            st.markdown("#### The Math")
-            st.markdown(f"**Arithmetic Average:** `({r1}% + {r2}%) / 2` = **{arithmetic_mean:.2f}%**")
-            st.markdown(f"**Geometric Average:** `sqrt({m1} * {m2}) - 1` = **{geom_str}**")
+            # Arithmetic Math
+            m_arithmetic = (m1 + m2) / 2
+            arithmetic_return = (m_arithmetic - 1) * 100
+            
+            # Geometric Math
+            if (m1 * m2) >= 0:
+                m_geometric = math.sqrt(m1 * m2)
+                geom_return = (m_geometric - 1) * 100
+                geom_str = f"{geom_return:.2f}\\%"
+            else:
+                m_geometric = None
+                geom_return = -100
+                geom_str = "\\text{Total Loss}"
+            
+            st.markdown("#### Step 1: Find the Multipliers ($m$)")
+            st.markdown(f"$m_1 = 1 + \\frac{{{r1}}}{{100}} = \\mathbf{{{m1:.2f}}}$")
+            st.markdown(f"$m_2 = 1 + \\frac{{{r2}}}{{100}} = \\mathbf{{{m2:.2f}}}$")
+            
+            st.markdown("#### Step 2: Calculate the Mean Multipliers")
+            st.markdown("**Arithmetic Mean Multiplier:**")
+            st.latex(r"\bar{m} = \frac{m_1 + m_2}{2}")
+            st.latex(f"\\bar{{m}} = \\frac{{{m1:.2f} + {m2:.2f}}}{{2}} = {m_arithmetic:.2f}")
+            
+            st.markdown("**Geometric Mean Multiplier:**")
+            st.latex(r"\bar{m}_{geo} = \sqrt{m_1 \times m_2}")
+            if m_geometric is not None:
+                st.latex(f"\\bar{{m}}_{{geo}} = \\sqrt{{{m1:.2f} \\times {m2:.2f}}} = {m_geometric:.4f}")
+            else:
+                st.latex(r"\bar{m}_{geo} = \text{Undefined}")
+                
+            st.markdown("#### Step 3: Convert Back to % Return")
+            with st.expander("🤔 Why do we subtract 1 here?"):
+                st.markdown("Because we added `1` to our percentages in Step 1, the result in Step 2 is an *Average Multiplier* (e.g., 1.05 means you end up with 105% of your money). We must subtract that `1` (your original 100% principal) back out to isolate just the pure rate of return.")
+                
+            st.latex(f"\\text{{Arithmetic Return}} = ({m_arithmetic:.2f} - 1) \\times 100 = {arithmetic_return:.2f}\\%")
+            if m_geometric is not None:
+                st.latex(f"\\text{{Geometric Return}} = ({m_geometric:.4f} - 1) \\times 100 = {geom_str}")
+            else:
+                st.latex(r"\text{Geometric Return} = \text{Total Loss}")
             
         with c2:
             st.markdown("#### The Reality Check ($100 Investment)")
@@ -231,10 +264,9 @@ with main_tab1:
             actual_y1 = actual_y0 * m1
             actual_y2 = actual_y1 * m2
             
-            arith_multiplier = 1 + (arithmetic_mean/100)
             fake_y0 = 100
-            fake_y1 = fake_y0 * arith_multiplier
-            fake_y2 = fake_y1 * arith_multiplier
+            fake_y1 = fake_y0 * m_arithmetic
+            fake_y2 = fake_y1 * m_arithmetic
             
             sim_df = pd.DataFrame({
                 'Year': ['Start', 'Yr 1', 'Yr 2'],
@@ -248,10 +280,11 @@ with main_tab1:
             fig_geom.add_hline(y=100, line_dash="dot", line_color="gray", annotation_text="Breakeven ($100)")
             st.plotly_chart(fig_geom, width='stretch')
             
-            if arithmetic_mean > geom_mean:
-                st.warning(f"##### **Look at the red line! The Arithmetic mean claims you are making +{arithmetic_mean:.2f}% every year. But the green line shows your true portfolio value. The Geometric mean ({geom_str}) tells the exact truth about your actual compounded growth.**")
+            if arithmetic_return > geom_return:
+                st.warning(f"##### **Look at the red line! The Arithmetic mean claims you are making +{arithmetic_return:.2f}% every year. But the green line shows your true portfolio value. The Geometric mean ({geom_str.replace('%', ' %').replace('\\text{Total Loss}', 'Total Loss')}) tells the exact truth about your actual compounded growth.**")
 
-    # --- 1.4 Symmetry & Skewness ---
+                
+
     with c_tab4:
         st.info("💡##### **Concept:** Skewness occurs when outliers pull the Mean away from the Median.")
         skew_type = st.radio("Select Shape:", ["Symmetric (Normal)", "Right-Skewed (Positive Skew)", "Left-Skewed (Negative Skew)"], horizontal=True)
